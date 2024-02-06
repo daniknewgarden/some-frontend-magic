@@ -2,32 +2,54 @@ import { TextareaAutosize } from "@mui/base/TextareaAutosize";
 import { Button } from "@mui/base/Button";
 import Stack from "@mui/material/Stack";
 import { Box } from "@mui/material";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { BlockArea } from "../App";
 
-// TODO: rename to CodeBlock
-export function InputArea() {
-  const [executionResult, setExecutionResult] = useState("jfksdjflk");
+interface BlockAreaProps {
+  id: string;
+  blocksMap: Map<string, Block>;
+  onEdit: (id: string, value: string) => void;
+}
+
+export function BlockArea({ id, onEdit, blocksMap }: BlockAreaProps) {
+  const [executionResult, setExecutionResult] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const value = inputRef.current?.value;
+    let value = inputRef.current?.value;
 
     if (!value) {
       setExecutionResult("No value");
     }
 
     try {
-      const result = eval(JSON.stringify(value));
+      const regex = /A\d+/g;
+      let matches = value?.match(regex);
+      if (matches) {
+        for (const match of matches) {
+          if (blocksMap.has(match)) {
+            value = value?.replace(match, `'${blocksMap.get(match)?.value || ""}' `);
+            debugger;
+          }
+        }
+      }
+
+      const result = eval(value as string);
       setExecutionResult(result.toString());
     } catch (error: any) {
       setExecutionResult(error.message);
     }
   };
 
+  useEffect(() => {
+    onEdit(id, executionResult);
+  }, [executionResult]);
+
   return (
     <Stack direction="column" spacing={2} alignItems="flex-start">
       <Stack direction="row" spacing={2} alignItems="flex-start">
+        {id}
         <form onSubmit={onSubmit}>
           <TextareaAutosize
             minRows={3}

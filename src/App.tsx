@@ -1,26 +1,41 @@
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { InputArea } from "./components";
+import { BlockArea } from "./components";
 import { Stack } from "@mui/material";
 import { Button } from "@mui/base";
 
-interface Block {
+export interface Block {
   id: string;
+  value: string;
 }
 
 function App() {
   const [blocks, setBlocks] = useState<Block[]>([]);
+  const blocksMap = new Map<string, Block>();
+  blocks.forEach(block => {
+    blocksMap.set(block.id, block);
+  });
 
   const onBlockAdd = () => {
     setBlocks(prev => {
-      return [...prev, { id: uuidv4() }];
+      return [...prev, { id: `A${blocks.length + 1}`, value: "" }];
+    });
+  };
+
+  const onBlockEdit = (id: string, value: string) => {
+    setBlocks(prev => {
+      return prev.map(block => {
+        if (block.id === id) {
+          return { ...block, value };
+        }
+        return block;
+      });
     });
   };
 
   return (
     <Stack spacing={2} justifyContent="center">
       {blocks.map(block => (
-        <InputArea key={block.id} />
+        <BlockArea key={block.id} id={block.id} onEdit={onBlockEdit} blocksMap={blocksMap} />
       ))}
       <Button onClick={onBlockAdd}>Add Block</Button>
     </Stack>
