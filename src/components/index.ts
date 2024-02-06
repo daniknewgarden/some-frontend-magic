@@ -1,1 +1,1 @@
-export * from "./InputArea";
+export * from "./BlockArea";

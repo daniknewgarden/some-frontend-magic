@@ -3,7 +3,7 @@ import { Button } from "@mui/base/Button";
 import Stack from "@mui/material/Stack";
 import { Box } from "@mui/material";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { BlockArea } from "../App";
+import { Block } from "../App";
 
 interface BlockAreaProps {
   id: string;
